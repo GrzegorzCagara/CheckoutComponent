@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ItemService {
@@ -30,7 +31,12 @@ public class ItemService {
     }
 
     @Transactional
-    public Item findByName(String name) {
-        return itemRepository.findByName(name);
+    public Optional<Item> findItemByName(String name) {
+        return itemRepository.findItemByName(name);
+    }
+
+    @Transactional
+    public Optional<Item> findItemById(long id){
+        return itemRepository.findItemById(id);
     }
 }

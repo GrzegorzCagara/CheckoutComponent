@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -36,31 +37,54 @@ public class ItemRestController {
         return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
     }
 
-    @GetMapping("/{name}")
+    @GetMapping("/item/{name}")
     public ResponseEntity<?> findItemByName(@PathVariable("name") String name){
         logger.info("Fetching Item with name {}", name);
-        Item item = itemService.findByName(name);
-        if (item == null){
+
+        Optional<Item> optionalItem = itemService.findItemByName(name);
+        if (optionalItem.isPresent()){
+            Item item = optionalItem.get();
+            return new ResponseEntity<Item>(item, HttpStatus.OK);
+        } else {
             logger.error("Item with name {} not found.", name);
-            return new ResponseEntity(new CustomErrorType("Item with name " + name + " not found"),
-                    HttpStatus.NOT_FOUND);
+            return notFoundItem("Item with name " + name + " not found");
         }
-        return new ResponseEntity<Item>(item, HttpStatus.OK);
+    }
+
+    @GetMapping("/item/{id}")
+    public ResponseEntity<?> findItemById(@PathVariable("id") long id){
+        logger.info("Fetching Item with id {}", id);
+
+        Optional<Item> optionalItem = itemService.findItemById(id);
+        if (optionalItem.isPresent()){
+            Item item = optionalItem.get();
+            return new ResponseEntity<Item>(item, HttpStatus.OK);
+        } else {
+            logger.error("Item with id {} not found.", id);
+            return notFoundItem("Item with id " + id + " not found");
+        }
     }
 
 
 
-//    @GetMapping("/test")
-//    public void add(){
-//        itemService.addNewItem(item);
-//        itemService.addNewItem(item2);
-//    }
+    @PostMapping("/add/{id}/{quantity}/")
+    public ResponseEntity<String> addNewItem(@PathVariable("id") long itemId,
+                                             @PathVariable("quantity") int quantity){
+        Optional<Item> optionalItem = itemService.findItemById(itemId);
+        if (optionalItem.isPresent()){
+            Item item = optionalItem.get();
+            logger.info("Inserting Item : {}, with quantity {}", item, quantity);
+            itemService.addNewItem(item);
+            return new ResponseEntity<>("New item has been added", HttpStatus.OK);
+        } else{
+            logger.error("Item with id {} not found.", itemId);
+            return notFoundItem("Item with id " + itemId + " not found");
+        }
 
-    @PostMapping("/item")
-    public ResponseEntity<String> addItem(@RequestBody Item item){
-        logger.info("Creating Item : {}", item);
-        itemService.addNewItem(item);
-        return new ResponseEntity<>("New item has been added", HttpStatus.CREATED);
+    }
+
+    private ResponseEntity<String> notFoundItem(String errorMessage){
+        return new ResponseEntity(new CustomErrorType(errorMessage), HttpStatus.NOT_FOUND);
     }
 
 
