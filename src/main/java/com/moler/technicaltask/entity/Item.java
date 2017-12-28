@@ -2,15 +2,16 @@ package com.moler.technicaltask.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Setter
 @Getter
+@ToString
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -20,6 +21,7 @@ public class Item {
     private Double price;
     private Integer unit;
     private Double specialPrice;
+
 
     public Item(){}
 
