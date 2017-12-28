@@ -42,10 +42,7 @@ public class BasketServiceImpl implements BasketService{
         return basketRepository.save(basket);
     }
 
-    @Transactional
-    public Basket findBasketById(Long basketId){
-        return returnBasketIfNotNull(basketId);
-    }
+
 
     @Transactional
     public void addItemToBasket(Long itemId, Integer quantity, Long basketId){
