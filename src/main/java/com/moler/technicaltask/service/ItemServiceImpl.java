@@ -41,6 +41,7 @@ public class ItemServiceImpl implements ItemService{
     private Item returnItemIfNotNull(Long itemId){
         log.info("Fetching Item with id {}", itemId);
         Optional<Item> optionalItem = itemRepository.findItemById(itemId);
+
         if (optionalItem.isPresent()) {
             return optionalItem.get();
         } else {

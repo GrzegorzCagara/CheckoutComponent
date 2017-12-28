@@ -2,47 +2,52 @@ package com.moler.technicaltask.service;
 
 
 import com.moler.technicaltask.entity.Item;
+import com.moler.technicaltask.exception.ItemNotFoundRunTimeException;
 import com.moler.technicaltask.repository.ItemRepository;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional.*;
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ItemServiceImplTest {
 
-    private ItemService itemService;
-    private ItemRepository itemRepository;
+    @Mock
+    private ItemRepository mockItemRepository;
 
-    @Before
-    public void setUp() throws Exception {
-        itemRepository = Mockito.mock(ItemRepository.class);
+    @InjectMocks
+    private ItemServiceImpl testedObject;
 
-        itemService = new ItemServiceImpl(itemRepository);
-    }
 
     @Test
     public void shouldAddNewItem() {
         Item itemtoAdd = new Item();
 
-        when(itemRepository.save(itemtoAdd)).thenReturn(itemtoAdd);
+        when(mockItemRepository.save(itemtoAdd)).thenReturn(itemtoAdd);
 
-        itemService.save(itemtoAdd);
+        testedObject.save(itemtoAdd);
 
-        verify(itemRepository, times(1)).save(itemtoAdd);
+        verify(mockItemRepository, times(1)).save(itemtoAdd);
 
     }
 
     @Test
     public void shouldReturnAllItems() {
-        when(itemRepository.findAll()).thenReturn(getAllItems());
+        when(mockItemRepository.findAll()).thenReturn(getAllItems());
 
-        List<Item> items = itemService.findAll();
+        List<Item> items = testedObject.findAll();
 
         assertThat(items).isNotNull();
         assertThat(items).isNotEmpty();
@@ -50,16 +55,21 @@ public class ItemServiceImplTest {
     }
 
     @Test
-    public void shouldFindItemById() {
+    public void shouldReturnSpecificItemWhenIdPassed() {
         Item item = new Item();
         item.setId(15L);
-        when(itemRepository.findItemById(15)).thenReturn(java.util.Optional.of((item)));
+        when(mockItemRepository.findItemById(15)).thenReturn(java.util.Optional.of((item)));
 
-        Item foundItem = itemService.findItemById(15);
+        Item foundItem = testedObject.findItemById(15);
         assertThat(foundItem).isNotNull();
         assertThat(item).isEqualTo(item);
         assertThat(foundItem.getId()).isEqualTo(15);
+    }
 
+    @Test(expected = ItemNotFoundRunTimeException.class)
+    public void shouldThrowItemNotFoundRunTimeExceptionWhenItemNotFound() {
+        when(mockItemRepository.findItemById(10)).thenReturn(Optional.empty());
+        testedObject.findItemById(10);
     }
 
     private List<Item> getAllItems() {
