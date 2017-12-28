@@ -62,7 +62,7 @@ public class ItemServiceImplTest {
 
         Item foundItem = testedObject.findItemById(15);
         assertThat(foundItem).isNotNull();
-        assertThat(item).isEqualTo(item);
+        assertThat(item).isEqualTo(foundItem);
         assertThat(foundItem.getId()).isEqualTo(15);
     }
 

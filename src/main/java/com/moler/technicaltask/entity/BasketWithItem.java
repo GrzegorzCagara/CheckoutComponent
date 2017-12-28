@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Setter
 @Getter
 @ToString
-public class BasketAndItem {
+public class BasketWithItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -22,9 +22,9 @@ public class BasketAndItem {
 
     private Integer quantity;
 
-    public BasketAndItem(){}
+    public BasketWithItem(){}
 
-    public BasketAndItem(Basket basket, Item item, Integer quantity) {
+    public BasketWithItem(Basket basket, Item item, Integer quantity) {
         this.basket = basket;
         this.item = item;
         this.quantity = quantity;

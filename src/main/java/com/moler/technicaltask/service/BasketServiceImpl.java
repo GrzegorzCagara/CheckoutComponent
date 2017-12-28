@@ -3,9 +3,9 @@ package com.moler.technicaltask.service;
 import com.moler.technicaltask.entity.BasketStatus;
 import com.moler.technicaltask.entity.Basket;
 
-import com.moler.technicaltask.entity.BasketAndItem;
+import com.moler.technicaltask.entity.BasketWithItem;
 import com.moler.technicaltask.entity.Item;
-import com.moler.technicaltask.repository.BasketItemsRepository;
+import com.moler.technicaltask.repository.BasketWithItemRepository;
 import com.moler.technicaltask.repository.BasketRepository;
 import com.moler.technicaltask.repository.ItemRepository;
 import com.moler.technicaltask.exception.BasketIsClosedRunTimeException;
@@ -30,7 +30,7 @@ public class BasketServiceImpl implements BasketService{
 
     private final BasketRepository basketRepository;
     private final ItemRepository itemRepository;
-    private final BasketItemsRepository basketItemsRepository;
+    private final BasketWithItemRepository basketWithItemRepository;
     private final DiscountCalculator discountCalculator;
 
 
@@ -48,14 +48,14 @@ public class BasketServiceImpl implements BasketService{
     public void addItemToBasket(Long itemId, Integer quantity, Long basketId){
         Basket basket = returnBasketIfNotNull(basketId);
         Item item = returnItemIfNotNull(itemId);
-        BasketAndItem basketItems = new BasketAndItem(basket, item, quantity);
+        BasketWithItem basketItems = new BasketWithItem(basket, item, quantity);
         if (isBasketOpen(basket)){
-            List<Long> basketAndItemIdAndQuantityOfItem =  returnBasketAndItemIdAndQuantityOfItemIfAlreadyExists(itemId, basketId);
+            List<Long> basketAndItemIdAndQuantityOfItem =  returnBasketWithItemIdAndQuantityOfItemIfAlreadyExists(itemId, basketId);
             if (basketAndItemIdAndQuantityOfItem != null){
-                basketItemsRepository.update(basketAndItemIdAndQuantityOfItem.get(0), (int) (quantity + basketAndItemIdAndQuantityOfItem.get(1)));
+                basketWithItemRepository.update(basketAndItemIdAndQuantityOfItem.get(0), (int) (quantity + basketAndItemIdAndQuantityOfItem.get(1)));
                 log.info("Updating Item : {}, with quantity {}", item, quantity);
             } else{
-                basketItemsRepository.save(basketItems);
+                basketWithItemRepository.save(basketItems);
                 log.info("Inserting Item : {}, with quantity {}", item, quantity);
             }
         } else{
@@ -109,13 +109,13 @@ public class BasketServiceImpl implements BasketService{
         }
     }
 
-    private List<Long> returnBasketAndItemIdAndQuantityOfItemIfAlreadyExists(Long itemId, Long basketId){
+    private List<Long> returnBasketWithItemIdAndQuantityOfItemIfAlreadyExists(Long itemId, Long basketId){
         List<Long> basketAndItemIdAndQuantity = new ArrayList<>();
-        List<BasketAndItem> basketAndItems = basketItemsRepository.findAllByBasket_Id(basketId);
-        for (BasketAndItem basketAndItem : basketAndItems) {
-            if (basketAndItem.getItem().getId() == itemId){
-                basketAndItemIdAndQuantity.add(basketAndItem.getId());
-                basketAndItemIdAndQuantity.add(Long.valueOf(basketAndItem.getQuantity()));
+        List<BasketWithItem> basketWithItems = basketWithItemRepository.findAllByBasket_Id(basketId);
+        for (BasketWithItem basketWithItem : basketWithItems) {
+            if (basketWithItem.getItem().getId() == itemId){
+                basketAndItemIdAndQuantity.add(basketWithItem.getId());
+                basketAndItemIdAndQuantity.add(Long.valueOf(basketWithItem.getQuantity()));
                 return basketAndItemIdAndQuantity;
             }
         }

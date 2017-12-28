@@ -5,13 +5,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(MockitoJUnitRunner.class)
-public class BasketAndItemTest {
+public class BasketWithItemTest {
 
     @Mock
     private Item item;
@@ -20,14 +19,14 @@ public class BasketAndItemTest {
     private Basket basket;
 
     @InjectMocks
-    private BasketAndItem testedObject;
+    private BasketWithItem testedObject;
 
     private static final Long ID = 1L;
     private static final Integer QUANTITY = 13;
 
     @Before
     public void setUp() throws Exception {
-        testedObject = new BasketAndItem(basket, item, QUANTITY);
+        testedObject = new BasketWithItem(basket, item, QUANTITY);
         testedObject.setId(ID);
     }
 
