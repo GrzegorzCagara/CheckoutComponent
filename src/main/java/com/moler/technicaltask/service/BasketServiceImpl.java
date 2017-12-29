@@ -35,13 +35,13 @@ public class BasketServiceImpl implements BasketService{
 
 
     @Transactional
-    public Basket saveBasket(Basket basket){
+    public Basket openBasket(){
+        Basket basket = new Basket();
         log.info("Opening new Basket");
         basket.setBasketStatus(BasketStatus.OPEN);
         log.info("Basket with id {} opened", basket.getId());
         return basketRepository.save(basket);
     }
-
 
 
     @Transactional
