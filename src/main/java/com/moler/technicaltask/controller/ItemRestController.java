@@ -24,7 +24,7 @@ public class ItemRestController {
     private final ItemService itemService;
     private final BasketService basketService;
 
-    @PostMapping("")
+    @GetMapping("")
     public ResponseEntity<List<Item>> getAllItems(){
         List<Item> items = itemService.findAll();
 

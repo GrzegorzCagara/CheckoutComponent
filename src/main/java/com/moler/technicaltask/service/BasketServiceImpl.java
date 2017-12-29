@@ -39,8 +39,9 @@ public class BasketServiceImpl implements BasketService{
         Basket basket = new Basket();
         log.info("Opening new Basket");
         basket.setBasketStatus(BasketStatus.OPEN);
+        basket = basketRepository.save(basket);
         log.info("Basket with id {} opened", basket.getId());
-        return basketRepository.save(basket);
+        return basket;
     }
 
 
