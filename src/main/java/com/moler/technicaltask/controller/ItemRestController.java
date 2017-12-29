@@ -1,5 +1,6 @@
 package com.moler.technicaltask.controller;
 
+import com.moler.technicaltask.entity.BasketWithItem;
 import com.moler.technicaltask.entity.Item;
 import com.moler.technicaltask.service.BasketService;
 import com.moler.technicaltask.service.BasketServiceImpl;
@@ -41,10 +42,10 @@ public class ItemRestController {
     }
 
     @PostMapping("/add/{itemId}/{quantity}/{basketId}")
-    public ResponseEntity<String> addItemToBasket(@PathVariable("itemId") Long itemId,
+    public ResponseEntity<BasketWithItem> addItemToBasket(@PathVariable("itemId") Long itemId,
                                                   @PathVariable("quantity") Integer quantity,
                                                   @PathVariable("basketId") Long basketId){
-        basketService.addItemToBasket(itemId, quantity, basketId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        BasketWithItem result = basketService.addItemToBasket(itemId, quantity, basketId);
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 }

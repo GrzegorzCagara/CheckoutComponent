@@ -1,23 +1,35 @@
 package com.moler.technicaltask.controller;
 
+import com.moler.technicaltask.entity.Basket;
+import com.moler.technicaltask.entity.BasketStatus;
+import com.moler.technicaltask.entity.BasketWithItem;
 import com.moler.technicaltask.entity.Item;
 import com.moler.technicaltask.service.BasketService;
 import com.moler.technicaltask.service.ItemService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
@@ -34,57 +46,115 @@ public class ItemRestControllerTest {
     private BasketService basketService;
 
     Item mockItem = new Item.Builder()
-            .withName("Chocolate").withPrice(4.15).withSpecialPrice(10.0).withUnit(3).build();
+            .withName("Pepsi").withPrice(4.0).withSpecialPrice(10.0).withUnit(4).build();
 
-//    String exampleCourseJson = "{\"name\":\"Spring\",\"description\":\"10 Steps\",\"steps\":[\"Learn Maven\",\"Import Project\",\"First Example\",\"Second Example\"]}";
-//
-//    @Test
-//    public void retrieveDetailsForCourse() throws Exception {
-//
-//        Mockito.when(
-//                studentService.retrieveCourse(Mockito.anyString(),
-//                        Mockito.anyString())).thenReturn(mockCourse);
-//
-//        RequestBuilder requestBuilder = MockMvcRequestBuilders.get(
-//                "/students/Student1/courses/Course1").accept(
-//                MediaType.APPLICATION_JSON);
-//
-//        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
-//
-//        System.out.println(result.getResponse());
-//        String expected = "{id:Course1,name:Spring,description:10 Steps}";
-//
-//        // {"id":"Course1","name":"Spring","description":"10 Steps, 25 Examples and 10K Students","steps":["Learn Maven","Import Project","First Example","Second Example"]}
-//
-//        JSONAssert.assertEquals(expected, result.getResponse()
-//                .getContentAsString(), false);
-//    }
-//
-//}
-
-    @Test
-    public void getAllItems() {
+    @Before
+    public void setUp() throws Exception{
+        mockItem.setId(20L);
     }
+    
 
     @Test
-    public void findItemById() throws Exception {
-        mockItem.setId(1L);
-        when(itemService.findItemById(1)).thenReturn(mockItem);
+    public void shouldRetrieveItems() throws Exception {
+        List<Item> mockItems = getItems();
+        when(itemService.findAll()).thenReturn(mockItems);
 
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.get(
-                "/items/1").accept(
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.post(
+                "/items").accept(
                 MediaType.APPLICATION_JSON);
-
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
-        System.out.println(result.getResponse());
-        String expected = "{\"id\":20,\"name\":\"Pepsi\",\"price\":4.0,\"unit\":4,\"specialPrice\":10.0}";
+        String expected = "[\n" +
+                "    {\n" +
+                "        \"id\": 1,\n" +
+                "        \"name\": \"Beer\",\n" +
+                "        \"price\": 2.55,\n" +
+                "        \"unit\": 4,\n" +
+                "        \"specialPrice\": 8\n" +
+                "    },\n" +
+                "    {\n" +
+                "        \"id\": 2,\n" +
+                "        \"name\": \"Chocolate\",\n" +
+                "        \"price\": 4.15,\n" +
+                "        \"unit\": 3,\n" +
+                "        \"specialPrice\": 10\n" +
+                "    }]";
+
+        MockHttpServletResponse response = result.getResponse();
+
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
 
         JSONAssert.assertEquals(expected, result.getResponse()
                 .getContentAsString(), false);
     }
 
     @Test
-    public void addItemToBasket() {
+    public void shouldRetrieveDetailsForItem() throws Exception {
+        when(itemService.findItemById(20)).thenReturn(mockItem);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get(
+                "/items/20").accept(
+                MediaType.APPLICATION_JSON);
+
+        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+
+        String expected = "{\"id\":20,\"name\":\"Pepsi\",\"price\":4.0,\"unit\":4,\"specialPrice\":10.0}";
+
+        MockHttpServletResponse response = result.getResponse();
+
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        JSONAssert.assertEquals(expected, result.getResponse()
+                .getContentAsString(), false);
+    }
+
+    @Test
+    public void shouldAddItemToBasket() throws Exception {
+        Basket basket = new Basket();
+        basket.setId(1L);
+        basket.setBasketStatus(BasketStatus.OPEN);
+
+        BasketWithItem exampleBasketWithItem = new BasketWithItem(basket, mockItem, 5);
+        exampleBasketWithItem.setId(1L);
+
+        when(basketService.addItemToBasket(mockItem.getId(), 5, basket.getId())).thenReturn(exampleBasketWithItem);
+
+        String expected = "{\n" +
+                "    \"id\": 1,\n" +
+                "    \"basket\": {\n" +
+                "        \"id\": 1,\n" +
+                "        \"basketStatus\": \"OPEN\"\n" +
+                "    },\n" +
+                "    \"item\": {\n" +
+                "        \"id\": 20,\n" +
+                "        \"name\": \"Pepsi\",\n" +
+                "        \"price\": 4,\n" +
+                "        \"unit\": 4,\n" +
+                "        \"specialPrice\": 10\n" +
+                "    },\n" +
+                "    \"quantity\": 5\n" +
+                "}";
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/items/add/20/5/1")
+                .accept(MediaType.APPLICATION_JSON);
+
+        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        MockHttpServletResponse response = result.getResponse();
+
+        assertEquals(HttpStatus.CREATED.value(), response.getStatus());
+
+        JSONAssert.assertEquals(expected, result.getResponse()
+                .getContentAsString(), false);
+    }
+
+    private List<Item> getItems() {
+        Item beer = new Item.Builder()
+                .withName("Beer").withPrice(2.55).withSpecialPrice(8.0).withUnit(4).build();
+        beer.setId(1L);
+        Item chocolate = new Item.Builder()
+                .withName("Chocolate").withPrice(4.15).withSpecialPrice(10.0).withUnit(3).build();
+        chocolate.setId(2L);
+
+        return Arrays.asList(beer, chocolate);
     }
 }

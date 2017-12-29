@@ -45,7 +45,7 @@ public class BasketServiceImpl implements BasketService{
 
 
     @Transactional
-    public void addItemToBasket(Long itemId, Integer quantity, Long basketId){
+    public BasketWithItem addItemToBasket(Long itemId, Integer quantity, Long basketId){
         Basket basket = returnBasketIfNotNull(basketId);
         Item item = returnItemIfNotNull(itemId);
         BasketWithItem basketItems = new BasketWithItem(basket, item, quantity);
@@ -62,6 +62,7 @@ public class BasketServiceImpl implements BasketService{
             log.error("Basket with id {} is closed.", basketId);
             throw new BasketIsClosedRunTimeException((String.format("Basket with id: %d is closed.", basketId)));
         }
+        return basketItems;
     }
 
     @Transactional

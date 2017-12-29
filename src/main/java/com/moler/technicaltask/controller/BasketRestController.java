@@ -19,10 +19,10 @@ public class BasketRestController {
     public ResponseEntity<Long> openBasket(){
         Basket basket = new Basket();
         basket = basketService.saveBasket(basket);
-        return new ResponseEntity<>(basket.getId(), HttpStatus.OK);
+        return new ResponseEntity<>(basket.getId(), HttpStatus.CREATED);
     }
 
-    @PostMapping("/close/{basketId}")
+    @GetMapping("/close/{basketId}")
     public ResponseEntity<Double> CalculateTotalPriceAndCloseBasket(@PathVariable("basketId") Long basketId){
         double totalPrice = basketService.getTotalPrice(basketId);
         basketService.closeBasket(basketId);
