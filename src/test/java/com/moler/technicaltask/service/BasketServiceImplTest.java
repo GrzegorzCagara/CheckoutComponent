@@ -5,6 +5,8 @@ import com.moler.technicaltask.entity.BasketStatus;
 import com.moler.technicaltask.entity.BasketWithItem;
 import com.moler.technicaltask.entity.Item;
 import com.moler.technicaltask.exception.BasketIsClosedRunTimeException;
+import com.moler.technicaltask.exception.BasketNotFoundRunTimeException;
+import com.moler.technicaltask.exception.ItemNotFoundRunTimeException;
 import com.moler.technicaltask.repository.BasketWithItemRepository;
 import com.moler.technicaltask.repository.BasketRepository;
 import com.moler.technicaltask.repository.ItemRepository;
@@ -18,6 +20,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.refEq;
@@ -44,13 +47,14 @@ public class BasketServiceImplTest {
     }
 
     @Test
-    public void shouldAddNewBasket() {
+    public void shouldOpenBasket() {
         Basket basketToAdd = new Basket();
+        basketToAdd.setBasketStatus(BasketStatus.OPEN);
         when(mockBasketRepository.save(basketToAdd)).thenReturn(basketToAdd);
 
-        testedObject.saveBasket(basketToAdd);
+        testedObject.openBasket();
 
-        verify(mockBasketRepository, times(1)).save(basketToAdd);
+        verify(mockBasketRepository, times(1)).save(refEq(basketToAdd));
     }
 
     @Test
@@ -105,8 +109,9 @@ public class BasketServiceImplTest {
         assertThat(result).isEqualTo(10.0);
     }
 
+
     @Test
-    public void closeBasket() {
+    public void shouldCloseBasket() {
         Basket basket = getOpenBasket();
 
         when(mockBasketRepository.findBasketById(basket.getId())).thenReturn(java.util.Optional.ofNullable(basket));

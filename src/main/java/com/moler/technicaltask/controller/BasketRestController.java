@@ -16,10 +16,9 @@ public class BasketRestController {
     private final BasketService basketService;
 
     @PostMapping("/open")
-    public ResponseEntity<Long> openBasket(){
-        Basket basket = new Basket();
-        basket = basketService.saveBasket(basket);
-        return new ResponseEntity<>(basket.getId(), HttpStatus.CREATED);
+    public ResponseEntity<Basket> openBasket(){
+        Basket basket = basketService.openBasket();
+        return new ResponseEntity<>(basket, HttpStatus.CREATED);
     }
 
     @GetMapping("/close/{basketId}")

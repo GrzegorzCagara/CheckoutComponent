@@ -13,7 +13,6 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -27,9 +26,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
@@ -45,14 +41,15 @@ public class ItemRestControllerTest {
     @MockBean
     private BasketService basketService;
 
-    Item mockItem = new Item.Builder()
-            .withName("Pepsi").withPrice(4.0).withSpecialPrice(10.0).withUnit(4).build();
+    private Item mockItem = null;
 
     @Before
     public void setUp() throws Exception{
+        mockItem = new Item.Builder()
+                .withName("Pepsi").withPrice(4.0).withSpecialPrice(10.0).withUnit(4).build();
         mockItem.setId(20L);
     }
-    
+
 
     @Test
     public void shouldRetrieveItems() throws Exception {
