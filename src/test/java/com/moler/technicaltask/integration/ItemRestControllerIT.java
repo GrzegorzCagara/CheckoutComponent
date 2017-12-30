@@ -7,7 +7,7 @@ import com.moler.technicaltask.entity.BasketWithItem;
 import com.moler.technicaltask.entity.Item;
 import com.moler.technicaltask.repository.BasketRepository;
 import com.moler.technicaltask.repository.ItemRepository;
-import com.moler.technicaltask.service.BasketService;
+import com.moler.technicaltask.service.ItemService;
 import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +29,10 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static org.mockito.Mockito.when;
+import java.util.List;
+
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -45,11 +48,8 @@ public class ItemRestControllerIT {
 
     private HttpHeaders headers = new HttpHeaders();
 
-    @Mock
-    BasketRepository basketRepository;
-
-    @Mock
-    ItemRepository itemRepository;
+    @Autowired
+    ItemService itemService;
 
     @Autowired
     private WebApplicationContext context;
@@ -58,40 +58,42 @@ public class ItemRestControllerIT {
 
     @Before
     public void setUp(){
+        addItemsToDatabase();
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
     }
 
     @Test
     public void retrieveDetailsForItem() throws JSONException {
+        List<Item> items = itemService.findAll();
+        Item item = items.get(0);
+        Long itemId = item.getId();
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
-                createURLWithPort("/items/20"),
+                createURLWithPort("/items/"+itemId),
                 HttpMethod.GET, entity, String.class);
 
-        String expected = "{id:20,name:Pepsi,price:4.0,unit:4,specialPrice:10.0}";
-
+        String expected = String.format("{id:%d,name:%s,price:%f,unit:%d,specialPrice:%f}",
+                item.getId(), item.getName(), item.getPrice(), item.getUnit(), item.getSpecialPrice());
+        System.out.println(expected);
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
 
+
     @Test
-    public void openNewBasket() throws Exception {
-        openNewBasket2();
+    public void openBasket() throws Exception {
+        openNewBasket();
     }
 
-//    @Test
-//    public void retrievieItems() throws JSONException {
-//        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
-//        ResponseEntity<String> response = restTemplate.exchange(
-//                createURLWithPort("/items"),
-//                HttpMethod.GET, entity, String.class);
-//
-//        String expected = "[{id:1,name:Beer,price:2.55,unit:4,specialPrice:8.0}," +
-//                "{id:2,name:Chocolate,price:4.15,unit:3,specialPrice:10.0}]";
-//        JSONAssert.assertEquals(expected, response.getBody(), false);
-//    }
+    @Test
+    public void shouldReturnCorrectHttpResponseWhenRetrieveAllItems() throws Exception {
+        String getAllItems = "/items";
+        mockMvc.perform(get(getAllItems))
+                .andExpect(status().isOk());
+    }
 
     @Test
     public void addItemToBasket() throws Exception {
+
         Basket basket = new Basket();
         basket.setId(1L);
         basket.setBasketStatus(BasketStatus.OPEN);
@@ -102,13 +104,11 @@ public class ItemRestControllerIT {
         BasketWithItem exampleBasketWithItem = new BasketWithItem(basket, beer, 5);
         exampleBasketWithItem.setId(1L);
 
-        int baksetId = openNewBasket2();
-
+        int baksetId = openNewBasket();
 
         String insertNewItem = "/items/add/{itemId}/{quantity}/{basketId}";
 
-        //when(itemRepository.findItemById(1)).thenReturn(java.util.Optional.ofNullable(beer));
-        mockMvc.perform(post(insertNewItem,20, 5, baksetId))
+        mockMvc.perform(post(insertNewItem,22, 5, baksetId))
                 .andExpect(status().isCreated())
                 .andDo(print());
     }
@@ -117,7 +117,7 @@ public class ItemRestControllerIT {
         return "http://localhost:" + port + uri;
     }
 
-    private Integer openNewBasket2() throws Exception {
+    private Integer openNewBasket() throws Exception {
         String openNewBasket = "/basket/open";
         MvcResult result = mockMvc.perform(post(openNewBasket))
                 .andExpect(status().isCreated())
@@ -129,5 +129,20 @@ public class ItemRestControllerIT {
         String basketId = resultList[0].substring(6);
 
         return Integer.valueOf(basketId);
+    }
+
+    private void addItemsToDatabase() {
+        Item pepsi = new Item.Builder()
+                .withName("Pepsi").withPrice(4.0).withSpecialPrice(10.0).withUnit(4).build();
+        Item chips = new Item.Builder()
+                .withName("Chips").withPrice(2.45).withSpecialPrice(4.0).withUnit(2).build();
+        Item beer = new Item.Builder()
+                .withName("Beer").withPrice(2.55).withSpecialPrice(8.0).withUnit(4).build();
+        Item chocolate = new Item.Builder()
+                .withName("Chocolate").withPrice(4.15).withSpecialPrice(10.0).withUnit(3).build();
+        itemService.save(pepsi);
+        itemService.save(chips);
+        itemService.save(beer);
+        itemService.save(chocolate);
     }
 }
