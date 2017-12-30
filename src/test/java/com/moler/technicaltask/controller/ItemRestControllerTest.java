@@ -56,26 +56,13 @@ public class ItemRestControllerTest {
         List<Item> mockItems = getItems();
         when(itemService.findAll()).thenReturn(mockItems);
 
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.post(
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get(
                 "/items").accept(
                 MediaType.APPLICATION_JSON);
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
-        String expected = "[\n" +
-                "    {\n" +
-                "        \"id\": 1,\n" +
-                "        \"name\": \"Beer\",\n" +
-                "        \"price\": 2.55,\n" +
-                "        \"unit\": 4,\n" +
-                "        \"specialPrice\": 8\n" +
-                "    },\n" +
-                "    {\n" +
-                "        \"id\": 2,\n" +
-                "        \"name\": \"Chocolate\",\n" +
-                "        \"price\": 4.15,\n" +
-                "        \"unit\": 3,\n" +
-                "        \"specialPrice\": 10\n" +
-                "    }]";
+        String expected = "[{id:1,name:Beer,price:2.55,unit:4,specialPrice:8.0}," +
+                        "{id:2,name:Chocolate,price:4.15,unit:3,specialPrice:10.0}]";
 
         MockHttpServletResponse response = result.getResponse();
 
@@ -95,7 +82,7 @@ public class ItemRestControllerTest {
 
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
-        String expected = "{\"id\":20,\"name\":\"Pepsi\",\"price\":4.0,\"unit\":4,\"specialPrice\":10.0}";
+        String expected = "{id:20,name:Pepsi,price:4.0,unit:4,specialPrice:10.0}";
 
         MockHttpServletResponse response = result.getResponse();
 
@@ -115,21 +102,8 @@ public class ItemRestControllerTest {
 
         when(basketService.addItemToBasket(mockItem.getId(), 5, basket.getId())).thenReturn(exampleBasketWithItem);
 
-        String expected = "{\n" +
-                "    \"id\": 1,\n" +
-                "    \"basket\": {\n" +
-                "        \"id\": 1,\n" +
-                "        \"basketStatus\": \"OPEN\"\n" +
-                "    },\n" +
-                "    \"item\": {\n" +
-                "        \"id\": 20,\n" +
-                "        \"name\": \"Pepsi\",\n" +
-                "        \"price\": 4,\n" +
-                "        \"unit\": 4,\n" +
-                "        \"specialPrice\": 10\n" +
-                "    },\n" +
-                "    \"quantity\": 5\n" +
-                "}";
+        String expected = "{id:1,basket:{id:1,basketStatus:OPEN}," +
+                        "item:{id:20,name:Pepsi,price:4.0,unit:4,specialPrice:10.0},quantity:5}";
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/items/add/20/5/1")

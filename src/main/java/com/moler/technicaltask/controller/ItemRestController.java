@@ -3,11 +3,8 @@ package com.moler.technicaltask.controller;
 import com.moler.technicaltask.entity.BasketWithItem;
 import com.moler.technicaltask.entity.Item;
 import com.moler.technicaltask.service.BasketService;
-import com.moler.technicaltask.service.BasketServiceImpl;
 import com.moler.technicaltask.service.ItemService;
-import com.moler.technicaltask.service.ItemServiceImpl;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +21,7 @@ public class ItemRestController {
     private final ItemService itemService;
     private final BasketService basketService;
 
-    @PostMapping("")
+    @GetMapping("")
     public ResponseEntity<List<Item>> getAllItems(){
         List<Item> items = itemService.findAll();
 

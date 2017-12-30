@@ -1,13 +1,11 @@
 package com.moler.technicaltask.service;
 
-import com.moler.technicaltask.controller.ItemRestController;
+
 import com.moler.technicaltask.entity.Item;
 import com.moler.technicaltask.repository.ItemRepository;
 import com.moler.technicaltask.exception.ItemNotFoundRunTimeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
