@@ -5,8 +5,6 @@ import com.moler.technicaltask.entity.BasketStatus;
 import com.moler.technicaltask.entity.BasketWithItem;
 import com.moler.technicaltask.entity.Item;
 import com.moler.technicaltask.exception.BasketIsClosedRunTimeException;
-import com.moler.technicaltask.exception.BasketNotFoundRunTimeException;
-import com.moler.technicaltask.exception.ItemNotFoundRunTimeException;
 import com.moler.technicaltask.repository.BasketWithItemRepository;
 import com.moler.technicaltask.repository.BasketRepository;
 import com.moler.technicaltask.repository.ItemRepository;
@@ -20,7 +18,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.refEq;
