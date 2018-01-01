@@ -90,22 +90,23 @@ public class ItemRestControllerIT {
 
     @Test
     public void addItemToBasket() throws Exception {
-
+        Long basketId = openNewBasket();
         Basket basket = new Basket();
-        basket.setId(1L);
+        basket.setId(basketId);
         basket.setBasketStatus(BasketStatus.OPEN);
         Item beer = new Item.Builder()
                 .withName("Beer").withPrice(2.55).withSpecialPrice(8.0).withUnit(4).build();
-        beer.setId(22L);
+
+        beer = itemService.save(beer);
 
         BasketWithItem exampleBasketWithItem = new BasketWithItem(basket, beer, 5);
         exampleBasketWithItem.setId(1L);
 
-        int baksetId = openNewBasket();
+
 
         String insertNewItem = "/items/add/{itemId}/{quantity}/{basketId}";
 
-        mockMvc.perform(post(insertNewItem,22, 5, baksetId))
+        mockMvc.perform(post(insertNewItem,beer.getId(), 5, basketId))
                 .andExpect(status().isCreated())
                 .andDo(print());
     }
@@ -114,7 +115,7 @@ public class ItemRestControllerIT {
         return "http://localhost:" + port + uri;
     }
 
-    private Integer openNewBasket() throws Exception {
+    private Long openNewBasket() throws Exception {
         String openNewBasket = "/basket/open";
         MvcResult result = mockMvc.perform(post(openNewBasket))
                 .andExpect(status().isCreated())
@@ -125,7 +126,7 @@ public class ItemRestControllerIT {
         String resultList[] = response.getContentAsString().split(",");
         String basketId = resultList[0].substring(6);
 
-        return Integer.valueOf(basketId);
+        return Long.valueOf(basketId);
     }
 
     private void addItemsToDatabase() {

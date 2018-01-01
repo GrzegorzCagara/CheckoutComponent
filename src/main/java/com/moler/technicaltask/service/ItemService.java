@@ -5,7 +5,7 @@ import com.moler.technicaltask.entity.Item;
 import java.util.List;
 
 public interface ItemService {
-    void save(Item item);
+    Item save(Item item);
     List<Item> findAll();
     Item findItemById(long id);
 }

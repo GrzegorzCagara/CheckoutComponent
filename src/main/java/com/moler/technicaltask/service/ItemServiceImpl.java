@@ -22,8 +22,8 @@ public class ItemServiceImpl implements ItemService{
 
 
     @Transactional
-    public void save(Item item){
-        itemRepository.save(item);
+    public Item save(Item item){
+        return itemRepository.save(item);
     }
 
     @Transactional
