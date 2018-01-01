@@ -23,3 +23,4 @@ Build tool: Maven.
 3.    Once the project is build enter: java -jar target\nameofjarfile.jar (in this case: technicaltask-1.0.0.jar)
 4.    Application is launched and ready to use with a browser
 
+When you launch tests, it generates sample data for Items.
